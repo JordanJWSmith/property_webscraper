@@ -13,8 +13,8 @@ def main():
     with open('location_codes.json', 'r') as f:
         location_codes = json.load(f)
     
-    # num_pages = 999 // 24  # Number of pages to scrape per location (24 properties per page)
-    num_pages = 2
+    num_pages = 999 // 24  # Number of pages to scrape per location (24 properties per page)
+    # num_pages = 2
 
     TestClass = Webscraper(user_agent, location_codes, num_pages)
     TestClass.scrape()
