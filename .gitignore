@@ -1,6 +1,6 @@
 # custom
 property_venv/
-json_data/
+json_data/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
