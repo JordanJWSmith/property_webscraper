@@ -38,18 +38,28 @@ This will save all scraped property data to your MongoDB collection, and save lo
 
 ## Data
 
-This toolkit is simple but powerful, and scrapes a large amount of data per property. Some is useful, some is not. 
+This toolkit is simple but powerful, and scrapes a large amount of data per property in nested JSON format. Some elements are useful, some are not. 
 
 Here is an overview:
 
-| Syntax      | Description |
-| ----------- | ----------- |
-| _id         | Unique Rightmove property ID  (str)      |
-| id          | Unique Rightmove property ID  (str)     |
-| bedrooms   | Number of bedrooms (int)       |
-| bathrooms   | Number of bathrooms (int)       |
-| numberOfImages   | Number of images associated with property (int)       |
-| numberofFloorplans   | Number of floorplan images associated with property (int)        |
+| Syntax      | Description | Type |
+| ----------- | ----------- | ---- |
+| _id         | Unique Rightmove property ID  (str)      | str |
+| id          | Unique Rightmove property ID  (str)     | str |
+| bedrooms   | Number of bedrooms (int)       | int |
+| bathrooms   | Number of bathrooms (int)       | int |
+| numberOfImages   | Number of images associated with property (int)       | int |
+| numberofFloorplans   | Number of floorplan images associated with property (int)        | int |
+| numberofFloorplans   | Number of floorplan images associated with property (int)        | int |
+| summary   | Written summary of the property (str)       | str |
+| displayAddress   | A truncated address, usually street and postcode (str)        | str |
+| countryCode   | A code to indicate the country, i.e. "GB"        | str |
+| location   | An object containing location information <ul><li>Latitude</li><li>Longitude</li><li>circleRadiusOnMap</li><li>zoomLevel</li><li>pinType</li><li>showMap</li></ul>        | Object: <ul><li>int</li><li>int</li><li>int</li><li>int</li><li>str</li><li>bool</li></ul> |
+| propertyImages   | An object containing image URLs for each property image. Also separate objects for the main image and main map image    | obj |
+
+
+
+
 
 
 
