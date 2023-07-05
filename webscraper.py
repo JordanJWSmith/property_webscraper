@@ -11,35 +11,38 @@ from pymongo import MongoClient
 load_dotenv()
 
 class Webscraper:
-    def __init__(self, db_name, collection_name, user_agent, location_codes, num_pages):
-        self.db_name = db_name
-        self.collection_name = collection_name
+    def __init__(self, user_agent, location_codes, num_pages):
         self.user_agent = user_agent
         self.location_codes = location_codes
         self.num_pages = num_pages
         self.MONGO_USER = os.getenv('MONGO_USER')
         self.MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
         self.MONGO_CLUSTER = os.getenv('MONGO_CLUSTER')
-        self.MONGO_COLLECTION = os.getenv('MONGO_CLUSTER')
+        self.MONGO_DB_NAME = os.getenv('MONGO_DB_NAME')
+        self.MONGO_COLLECTION = os.getenv('MONGO_COLLECTION')
 
 
     def insert_many_to_mongo(self, properties):
-        cluster = MongoClient(f"mongodb+srv://{self.MONGO_USER}:{self.MONGO_PASSWORD}@{self.MONGO_CLUSTER}/{self.MONGO_COLLECTION}")
-        db = cluster[self.db_name]
-        collection = db[self.collection_name]
+        cluster = MongoClient(f"mongodb+srv://{self.MONGO_USER}:{self.MONGO_PASSWORD}@{self.MONGO_CLUSTER}/{self.MONGO_DB_NAME}")
+        db = cluster[self.MONGO_DB_NAME]
+        collection = db[self.MONGO_COLLECTION]
 
         existing_property_ids = [str(i) for i in collection.distinct('_id')]
         properties_to_insert = [prop for prop in properties if prop['_id'] not in existing_property_ids]
         collection.insert_many(properties_to_insert)
 
-        logging.info(f'{len(properties_to_insert)} new properties written to MongoDB')
+        logging.info(f'{len(properties_to_insert)} new properties written to MongoDB \n')
 
         return len(properties_to_insert)
 
 
     def save_json(self, location, properties):
         timestring = datetime.strftime(datetime.now(), '%d-%m-%Y_%H-%M-%S')
-        with open(f'{location}_properties_{timestring}.json', 'w', encoding='utf-8') as f:
+
+        if not os.path.isdir("json_data"):
+            os.mkdir('json_data')
+
+        with open(f'json_data/{location}_properties_{timestring}.json', 'w', encoding='utf-8') as f:
             json.dump(properties, f, ensure_ascii=False, indent=4)
 
 
@@ -94,7 +97,8 @@ class Webscraper:
             location_properties = self.scrape_location(location, code)
 
             inserted_property_count = self.insert_many_to_mongo(location_properties)
-            self.save_json(f'json_data/{location}', location_properties)
+
+            self.save_json(location, location_properties)
 
             prop_count += inserted_property_count
 
