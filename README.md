@@ -54,12 +54,23 @@ Here is an overview:
 | summary   | Written summary of the property (str)       | str |
 | displayAddress   | A truncated address, usually street and postcode (str)        | str |
 | countryCode   | A code to indicate the country, i.e. "GB"        | str |
-| location   | An object containing location information <ul><li>Latitude</li><li>Longitude</li><li>circleRadiusOnMap</li><li>zoomLevel</li><li>pinType</li><li>showMap</li></ul>        | Object: <ul><li>int</li><li>int</li><li>int</li><li>int</li><li>str</li><li>bool</li></ul> |
-| propertyImages   | An object containing image URLs for each property image. Also separate objects for the main image and main map image    | obj |
+| location   | An object containing location information including latitude and longitude  | obj |
+| propertyImages   | An object containing image URLs for each property image. Also separate objects for the main image and main map image.    | obj |
+| propertySubType   | The type of property, i.e. "Apartment"    | str |
+| listingUpdate   | Object containing the reason and date a property was reduced   | obj |
+| premiumListing   | Whether or not the property is a premium listing.    | bool |
+|  featuredProperty   | Whether or not the property is a featured listing.    | bool |
+|  price   | An object containing the price, frequency and currencycode    | obj |
+|  customer   | An object containing information on the estate agent listing the property, including name, address and branch   | obj | 
+| distance | An object to signify distance | ? |
+| transactionType | What type of transaction this is, i.e. "BUY", "LET" | str | 
+| productLabel | An object describing a prdoduct label | obj | 
+| commercial | Whether the property is suitable for commercial use | bool | 
+| development | Whether the property is suitable for development | bool | 
+| residential | Whether the property is residential | bool | 
+| students | Whether the property is student accommodation | bool | 
 
-
-
-
+...and 65 other fields (document still in progress)
 
 
 
@@ -67,5 +78,6 @@ Here is an overview:
 ## To Do
 * Add optional arguments for `save_locally=False` and `num_pages=X`
 * Add more property codes
+* Review/complete data in above table
 
 
