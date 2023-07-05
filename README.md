@@ -2,7 +2,7 @@
 
 This is a simple toolkit to webscrape property data from Rightmove and store it in a MongoDB collection. 
 
-## Installatin
+## Installation
 
 Clone the repo, create your environment and run `pip install -r requirements.txt`. 
 
@@ -26,7 +26,7 @@ MONGO_DB_NAME="myFirstDatabase"
 MONGO_COLLECTION=<the mongoDB collection>
 ```
 
-See [https://medium.com/analytics-vidhya/connecting-to-mongodb-atlas-with-python-pymongo-5b25dab3ac53](this Medium article) for more guidance.
+See [this Medium article](https://medium.com/analytics-vidhya/connecting-to-mongodb-atlas-with-python-pymongo-5b25dab3ac53) for more guidance.
 
 
 ## Running
