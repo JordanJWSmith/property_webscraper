@@ -1,6 +1,7 @@
 # custom
 property_venv/
 json_data/
+image_classification/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
