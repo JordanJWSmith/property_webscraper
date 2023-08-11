@@ -79,5 +79,6 @@ Here is an overview:
 * Add optional arguments for `save_locally=False` and `num_pages=X`
 * Add more property codes
 * Review/complete data in above table
+* Add feature to convert to CSV
 
 

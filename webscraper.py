@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import requests
+import bson.json_util as json_util
 from tqdm import tqdm
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
@@ -27,8 +28,8 @@ class Webscraper:
         db = cluster[self.MONGO_DB_NAME]
         collection = db[self.MONGO_COLLECTION]
 
-        existing_property_ids = [str(i) for i in collection.distinct('_id')]
-        properties_to_insert = [prop for prop in properties if prop['_id'] not in existing_property_ids]
+        existing_property_ids = [str(i) for i in collection.distinct('id')]
+        properties_to_insert = [prop for prop in properties if prop['id'] not in existing_property_ids]
         collection.insert_many(properties_to_insert)
 
         logging.info(f'{len(properties_to_insert)} new properties written to MongoDB \n')
@@ -39,11 +40,15 @@ class Webscraper:
     def save_json(self, location, properties):
         timestring = datetime.strftime(datetime.now(), '%d-%m-%Y_%H-%M-%S')
 
+        print('properties type: ', type(properties))
+
         if not os.path.isdir("json_data"):
             os.mkdir('json_data')
 
+        # with open(f'json_data/{location}_properties_{timestring}.json', 'w', encoding='utf-8') as f:
+        #     json.dump(properties, f, ensure_ascii=False, indent=4)
         with open(f'json_data/{location}_properties_{timestring}.json', 'w', encoding='utf-8') as f:
-            json.dump(properties, f, ensure_ascii=False, indent=4)
+            f.write(json_util.dumps(properties))
 
 
     def scrape_location(self, location, location_code):
@@ -81,7 +86,7 @@ class Webscraper:
                             for key in property_page_data:
                                 prop[key] = property_page_data[key]
 
-                    prop['_id'] = prop['id']
+                    # prop['_id'] = prop['id']
                     prop['location_area'] = location
                     page_properties.append(prop)
                     
