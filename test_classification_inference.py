@@ -28,6 +28,7 @@ collection = db[MONGO_COLLECTION]
 
 sample = collection.aggregate([{ "$sample": { "size": 10 } }])
 
+# Model: https://huggingface.co/andupets/real-estate-image-classification-30classes
 API_URL = "https://api-inference.huggingface.co/models/andupets/real-estate-image-classification-30classes"
 headers = {"Authorization": f"Bearer {HF_TOKEN}"}
 
@@ -77,10 +78,12 @@ for prop_record in sample:
 
         if not isinstance(imscores, list):
             print('ERROR:', imscores)
-            print(f'Sleeping for {imscores['estimated_time']} seconds')
-            if 'estimated_time' in imscores.keys():
+            if "estimated_time" in imscores.keys():
+                print(f'Sleeping for {imscores["estimated_time"]} seconds')
                 time.sleep(imscores['estimated_time'])
-            continue
+                continue
+            break
+            
 
         scores = [pred['score'] for pred in imscores]
         max_ix = scores.index(max(scores))
