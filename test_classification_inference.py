@@ -3,13 +3,13 @@ import json
 import time
 import logging
 import requests
-import bson.json_util as json_util
 from tqdm import tqdm
 from skimage import io
-from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 from datetime import datetime
+from dotenv import load_dotenv
 from pymongo import MongoClient
+import bson.json_util as json_util
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
 
