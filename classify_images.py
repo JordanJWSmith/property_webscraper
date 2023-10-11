@@ -10,7 +10,6 @@ from pymongo import MongoClient
 from transformers import pipeline
 from PIL import UnidentifiedImageError
 
-
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 load_dotenv()
 
@@ -28,11 +27,17 @@ collection = db[MONGO_COLLECTION]
 # hugging face pipeline: https://huggingface.co/docs/transformers/main_classes/pipelines#transformers.ImageClassificationPipeline
 pipe = pipeline("image-classification", model="andupets/real-estate-image-classification-30classes")
 
-def generate_location_df(cursor, location):
-    ITEMS = []
+def generate_location_df(cursor, location, save_path):
+    # ITEMS = []
     i = 0
+
     for listing in cursor:
         
+        # load the existing location csv
+        save_df = pd.read_csv(save_path)
+
+        ITEMS = []
+
         _id = listing['id']
         property_url = f'https://www.rightmove.co.uk{listing["propertyUrl"]}'
         display_address = listing['displayAddress']
@@ -56,6 +61,7 @@ def generate_location_df(cursor, location):
             logging.info(f"{i}) Listing {_id} has no images ({property_url})")
             continue
 
+        # skip if image request unsuccessful
         if str(test_ping.status_code)[0] == '4':
             logging.info(f"{i}) Listing {_id} appears to no longer be live (status {test_ping.status_code}) ({property_url})")
             continue
@@ -76,27 +82,52 @@ def generate_location_df(cursor, location):
             # one row per image
             ITEMS.append([_id, property_url, display_address, bedrooms, bathrooms, price, image_url, score, label])
 
-    location_df = pd.DataFrame(ITEMS)
-    location_df.columns = ['_id', 'property_url', 'display_address', 'bedrooms', 'bathrooms', 'price', 'image_url', 'top_label_score', 'top_label']
+        # one df per property
+        location_df = pd.DataFrame(ITEMS)
+        location_df.columns = ['_id', 'property_url', 'display_address', 'bedrooms', 'bathrooms', 'price', 'image_url', 'top_label_score', 'top_label']
 
-    return location_df
+        # append the property to the existing csv and save
+        concat_df = pd.concat([save_df, location_df], ignore_index=True)
+        concat_df.to_csv(save_path, index=False)
+
+    return i
 
 
 # find a list of the available location codes
 location_areas = collection.distinct('location_area')  
+done = ['camden', 'city_of_london', 'wandsworth', 'greenwich', 'hackney', 'hammersmith', 'islington', 'kennington', 'kensington_and_chelsea', 'kingston', 'lambeth']
+location_areas = [location for location in location_areas if location not in done]
 
-# iterate through them in batches
+# iterate through each location
 for location in location_areas:
-    count_docs = collection.count_documents({'location_area': location})
 
-    # batch size stops it crashing at ~100 properties
-    cursor = collection.find({'location_area': location}, batch_size=50)
+    save_path = f'image_classification/{location}_image_classification.csv'
+
+    if not os.path.isfile(save_path):
+        init_df = pd.DataFrame(columns=['_id', 'property_url', 'display_address', 'bedrooms', 'bathrooms', 'price', 'image_url', 'top_label_score', 'top_label'])
+        init_df.to_csv(save_path, index=False)
+
+    save_df = pd.read_csv(save_path)
+    existing_ids = list(set(save_df['_id'].tolist()))
+
+    # ids from df are <int>, ids from mongo are <str>
+    existing_ids = [str(i) for i in existing_ids]
+
+    # load listings from given location that haven't been processed yet
+    mongo_query = {'location_area': location, 'id': { '$nin': existing_ids }}
+
+    count_docs = collection.count_documents(mongo_query)
+
+    # smaller batch size stops it crashing at ~100 properties
+    cursor = collection.find(mongo_query, batch_size=25)
 
     logging.info(f"Classifying {count_docs} listings from {location}")
 
     # run all properties for that location through the model
-    location_df = generate_location_df(cursor, location)
+    num_processed = generate_location_df(cursor, location, save_path)
 
-    location_df.to_csv(f'image_classification/{location}_image_classification.csv')
+    logging.info(f"Processed {num_processed} listings from {location}")
+
+    # location_df.to_csv(f'image_classification/{location}_image_classification.csv')
 
             
