@@ -45,8 +45,6 @@ class Webscraper:
         if not os.path.isdir("json_data"):
             os.mkdir('json_data')
 
-        # with open(f'json_data/{location}_properties_{timestring}.json', 'w', encoding='utf-8') as f:
-        #     json.dump(properties, f, ensure_ascii=False, indent=4)
         with open(f'json_data/{location}_properties_{timestring}.json', 'w', encoding='utf-8') as f:
             f.write(json_util.dumps(properties))
 
